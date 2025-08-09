@@ -1,15 +1,31 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// MVC + API controllers
 builder.Services.AddControllersWithViews();
+
+// CORS: cho phép client gọi API trong môi trường dev
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
+// Swagger (tuỳ chọn, nhưng tiện để test)
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -18,11 +34,16 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseCors("AllowAll"); // <- bật CORS trước Authorization
+
 app.UseAuthorization();
 
+// Map cho API dùng attribute routing: [Route("api/[controller]")]
+app.MapControllers();
+
+// Route MVC cho View (Home/Index mặc định)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
