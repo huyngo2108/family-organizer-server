@@ -8,23 +8,26 @@ namespace FamilyOrganizer_Server.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    [HttpGet("ping")]
+    public IActionResult Ping() => Ok(new { ok = true, time = DateTime.UtcNow });
+
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
-            return BadRequest(new AuthResponse { Success = false, Message = "Thiếu email hoặc mật khẩu." });
+            return BadRequest(new AuthResponse { Success = false, Message = "Missing email or password." });
 
         var user = InMemoryDb.Users.FirstOrDefault(u =>
             u.Email.Equals(req.Email.Trim(), StringComparison.OrdinalIgnoreCase) &&
             u.Password == req.Password);
 
         if (user == null)
-            return Unauthorized(new AuthResponse { Success = false, Message = "Email hoặc mật khẩu không đúng." });
+            return Unauthorized(new AuthResponse { Success = false, Message = "Incorrect email or password." });
 
         return Ok(new AuthResponse
         {
             Success = true,
-            Message = "Đăng nhập thành công.",
+            Message = "Login Successfu",
             Token = "fake-jwt-demo-token",
             Email = user.Email,
             FullName = user.FullName
