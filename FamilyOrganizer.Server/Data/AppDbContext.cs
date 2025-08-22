@@ -14,10 +14,29 @@ namespace FamilyOrganizer.Server.Data
             base.OnModelCreating(modelBuilder);
 
             var user = modelBuilder.Entity<User>();
-            user.Property(x => x.Email).HasMaxLength(255).IsRequired();
-            user.Property(x => x.Username).HasMaxLength(32).IsRequired();
-            user.Property(x => x.PasswordHash).IsRequired();
-            user.Property(x => x.FullName).HasMaxLength(255);
+
+            user.ToTable("users");
+
+            user.HasKey(x => x.Id);
+
+            user.Property(x => x.Email)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("email");
+
+            user.Property(x => x.Username)
+                .HasMaxLength(32)
+                .IsRequired()
+                .HasColumnName("username");
+
+            user.Property(x => x.PasswordHash)
+                .IsRequired()
+                .HasColumnName("password_hash");
+
+            user.Property(x => x.FullName)
+                .HasMaxLength(255)
+                .HasColumnName("full_name");
+
             user.HasIndex(x => x.Email).IsUnique();
             user.HasIndex(x => x.Username).IsUnique();
         }
